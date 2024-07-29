@@ -80,6 +80,59 @@ db.serialize(() => {
       address TEXT
     )
   `);
+  // Assuming you have a SQLite database connection as `db`
+
+  // Create Vaccines table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS Vaccines (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      description TEXT
+    )
+  `);
+
+  // Create VaccineReceived table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS VaccineReceived (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      childId INTEGER NOT NULL,
+      vaccineId INTEGER NOT NULL,
+      dateReceived DATE NOT NULL,
+      FOREIGN KEY (childId) REFERENCES Children(id) ON DELETE CASCADE,
+      FOREIGN KEY (vaccineId) REFERENCES Vaccines(id) ON DELETE CASCADE
+    )
+  `);
+
+  // Create VaccineRequests table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS VaccineRequests (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      childId INTEGER NOT NULL,
+      vaccineId INTEGER NOT NULL,
+      requestDate DATE NOT NULL,
+      status TEXT DEFAULT 'Pending',
+      FOREIGN KEY (childId) REFERENCES Children(id) ON DELETE CASCADE,
+      FOREIGN KEY (vaccineId) REFERENCES Vaccines(id) ON DELETE CASCADE
+    )
+  `);
+
+  // Create indexes for VaccineReceived
+  db.run(`
+    CREATE INDEX IF NOT EXISTS idx_vaccine_received_childId ON VaccineReceived (childId)
+  `);
+  db.run(`
+    CREATE INDEX IF NOT EXISTS idx_vaccine_received_vaccineId ON VaccineReceived (vaccineId)
+  `);
+
+  // Create indexes for VaccineRequests
+  db.run(`
+    CREATE INDEX IF NOT EXISTS idx_vaccine_requests_childId ON VaccineRequests (childId)
+  `);
+  db.run(`
+    CREATE INDEX IF NOT EXISTS idx_vaccine_requests_vaccineId ON VaccineRequests (vaccineId)
+  `);
+
+
   
 });
 

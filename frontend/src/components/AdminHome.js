@@ -1,4 +1,3 @@
-// components/AdminHome.js
 import React from 'react';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 
@@ -36,12 +35,19 @@ const AdminHome = () => {
     backgroundColor: '#c82333', // Darker shade for hover
   };
 
+  const containerStyle = {
+    height: '100vh',
+    display: 'flex',
+    flexDirection: 'column',
+  };
+
   const pageStyle = {
     padding: '20px',
     margin: '10px',
     borderRadius: '8px',
     background: '#f8f9fa',
-    height: '100vh',
+    flex: 1,
+    overflowY: 'auto',
   };
 
   const handleLogout = () => {
@@ -53,7 +59,7 @@ const AdminHome = () => {
   };
 
   return (
-    <div style={{ width: '100%', height: '100%' }}>
+    <div style={containerStyle}>
       <nav style={navStyle}>
         <Link to="/admin/attendance" style={linkStyle}>Children's Attendance</Link>
         <Link to="/admin/nutrition" style={linkStyle}>Nutritions</Link>
@@ -62,6 +68,7 @@ const AdminHome = () => {
         <Link to="/admin/polio-details" style={linkStyle}>Polio Details</Link>
         <Link to="/admin/timetable" style={linkStyle}>Time Table</Link>
         <Link to="/admin/child-requests" style={linkStyle}>Child Requests</Link>
+        <Link to="/admin/vaccines" style={linkStyle}>Vaccines</Link>
         <button
           style={buttonStyle}
           onMouseOver={(e) => e.currentTarget.style.backgroundColor = buttonHoverStyle.backgroundColor}

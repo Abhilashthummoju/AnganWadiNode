@@ -26,6 +26,7 @@ const Attendance = () => {
     try {
       const response = await fetch('http://localhost:8000/attendance');
       const data = await response.json();
+      console.log("data",data)
       setPreviousAttendance(data);
     } catch (error) {
       console.error('Error fetching previous attendance:', error);
@@ -73,7 +74,8 @@ const Attendance = () => {
     margin: '10px',
     borderRadius: '8px',
     background: '#f8f9fa',
-    height: '100%',
+    minHeight: '100vh',
+    overflowY: 'auto',
   };
 
   const headerStyle = {
@@ -83,60 +85,73 @@ const Attendance = () => {
   const tableStyle = {
     width: '100%',
     borderCollapse: 'collapse',
-    marginBottom: '20px',
   };
 
-  const tableHeaderStyle = {
-    backgroundColor: '#007bff',
-    color: '#fff',
-    padding: '10px',
-  };
-
-  const tableCellStyle = {
+  const thStyle = {
     border: '1px solid #ddd',
-    padding: '10px',
+    padding: '8px',
+    backgroundColor: '#f2f2f2',
+    textAlign: 'left',
+  };
+
+  const tdStyle = {
+    border: '1px solid #ddd',
+    padding: '8px',
+    textAlign: 'left',
   };
 
   const buttonStyle = {
-    marginTop: '10px',
-    padding: '10px',
+    padding: '10px 20px',
     border: 'none',
     borderRadius: '5px',
     backgroundColor: '#007bff',
     color: '#fff',
     cursor: 'pointer',
+    fontSize: '16px',
+    fontWeight: 'bold',
+    transition: 'background-color 0.3s ease',
+    marginTop: '20px',
   };
+
+  const buttonHoverStyle = {
+    backgroundColor: '#0056b3', // Darker shade for hover
+  };
+
+  const statusOptions = ['Present', 'Absent', 'Excused'];
 
   return (
     <div style={containerStyle}>
-      <h2 style={headerStyle}> Children Attendance</h2>
-      <label>
-        Select Date:
-        <input
-          type="date"
-          value={selectedDate}
-          onChange={handleDateChange}
-          style={{ marginLeft: '10px', padding: '5px', borderRadius: '4px',marginBottom:"10px" }}
-        />
-      </label>
+      <h2 style={headerStyle}>Attendance</h2>
+      <label htmlFor="date">Select Date: </label>
+      <input
+        type="date"
+        id="date"
+        value={selectedDate}
+        onChange={handleDateChange}
+      />
       <table style={tableStyle}>
         <thead>
           <tr>
-            <th style={tableHeaderStyle}>Name</th>
-            <th style={tableHeaderStyle}>Status</th>
+            <th style={thStyle}>Child ID</th>
+            <th style={thStyle}>Child Name</th>
+            <th style={thStyle}>Status</th>
           </tr>
         </thead>
         <tbody>
-          {children.map(child => (
+          {children.map((child) => (
             <tr key={child.id}>
-              <td style={tableCellStyle}>{child.name}</td>
-              <td style={tableCellStyle}>
+              <td style={tdStyle}>{child.id}</td>
+              <td style={tdStyle}>{child.name}</td>
+      
+              <td style={tdStyle}>
                 <select
-                  value={attendance[child.id] || 'Absent'}
+                  value={attendance[child.id] || ''}
                   onChange={(e) => handleStatusChange(child.id, e.target.value)}
                 >
-                  <option value="Present">Present</option>
-                  <option value="Absent">Absent</option>
+                  <option value="">Select Status</option>
+                  {statusOptions.map((option) => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
                 </select>
               </td>
             </tr>
@@ -145,27 +160,29 @@ const Attendance = () => {
       </table>
       <button
         style={buttonStyle}
+        onMouseOver={(e) => e.currentTarget.style.backgroundColor = buttonHoverStyle.backgroundColor}
+        onMouseOut={(e) => e.currentTarget.style.backgroundColor = buttonStyle.backgroundColor}
         onClick={submitAttendance}
         disabled={submitting} // Disable button during submission
       >
-        {submitting ? 'Submitting...' : 'Submit Attendance'}
+        Submit Attendance
       </button>
 
-      <h3 style={headerStyle}>Previous Attendance Records</h3>
+      <h2 style={{ marginTop: '40px' }}>Previous Attendance Records</h2>
       <table style={tableStyle}>
         <thead>
           <tr>
-            <th style={tableHeaderStyle}>Name</th>
-            <th style={tableHeaderStyle}>Date</th>
-            <th style={tableHeaderStyle}>Status</th>
+            <th style={thStyle}>Date</th>
+            <th style={thStyle}>Child Name</th>
+            <th style={thStyle}>Status</th>
           </tr>
         </thead>
         <tbody>
           {previousAttendance.map((record, index) => (
             <tr key={index}>
-              <td style={tableCellStyle}>{record.childName}</td>
-              <td style={tableCellStyle}>{record.date}</td>
-              <td style={tableCellStyle}>{record.status}</td>
+              <td style={tdStyle}>{record.date}</td>
+              <td style={tdStyle}>{record.childName}</td>
+              <td style={tdStyle}>{record.status}</td>
             </tr>
           ))}
         </tbody>

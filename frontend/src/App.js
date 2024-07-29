@@ -16,6 +16,10 @@ import ChildRequests from './components/ChildRequests';
 import MyAttendance from './components/MyAttendance';
 import ChildProfile from './components/ChildProfile';
 import MotherProfile from './components/MotherProfile';
+import Vaccines from './components/Vaccines'; // Import Vaccines
+import RequestVaccine from './components/RequestVaccine'; // Import the new component
+
+
 
 function App() {
   const appStyle = {
@@ -44,6 +48,10 @@ function App() {
     position: 'relative',
     zIndex: 1,
     display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+    height: '100%',
+    overflowY: 'auto', // Ensure content is scrollable
   };
 
   return (
@@ -64,12 +72,14 @@ function App() {
               <Route path="polio-details" element={<PolioDetails />} />
               <Route path="timetable" element={<TimeTable />} />
               <Route path="child-requests" element={<ChildRequests />} />
+              <Route path="vaccines" element={<Vaccines />} /> 
             </Route>
             <Route path="/children" element={<ChildrenHome />}>
               <Route index element={<MyAttendance />} />
               <Route path="attendance" element={<MyAttendance />} />
               <Route path="timetable" element={<TimeTable />} />
               <Route path="profile" element={<ChildProfile />} />
+              <Route path="request-vaccine" element={<RequestVaccine />} /> 
             </Route>
             <Route path="/mother" element={<MotherHome />}>
               <Route index element={<Nutrition />} />

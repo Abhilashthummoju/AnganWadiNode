@@ -1,10 +1,10 @@
 // components/ChildrenHome.js
 import React from 'react';
-import { Link, Outlet,useNavigate } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 
 const ChildrenHome = () => {
-    const navigate = useNavigate(); // Hook to programmatically navigate
-
+  const navigate = useNavigate(); // Hook to programmatically navigate
+  // console.log(JSON.parse(localStorage.getItem('childId')))
   const navStyle = {
     display: 'flex',
     justifyContent: 'space-around',
@@ -45,6 +45,7 @@ const ChildrenHome = () => {
         <Link to="/children/attendance" style={linkStyle}>View My Attendance</Link>
         <Link to="/children/timetable" style={linkStyle}>TimeTable</Link>
         <Link to="/children/profile" style={linkStyle}>Profile</Link>
+        <Link to="/children/request-vaccine" style={linkStyle}>Request Vaccine</Link> {/* New link */}
         <button onClick={handleLogout} style={buttonStyle}>Logout</button>
       </nav>
       <div style={{ padding: '20px', margin: '10px', borderRadius: '8px', background: '#f8f9fa', height: '100vh' }}>

@@ -90,8 +90,10 @@ const Login = () => {
       if (!response.ok) {
         throw new Error(data.message || 'An unexpected error occurred');
       }
+      if (data.id) {
+        localStorage.setItem("childId", JSON.stringify(data.id));
+      }
       console.log("LOGIN RESPONSE", data);
-
       // Navigate to respective home pages on successful login
       if (type === 'admin') {
         navigate('/admin');

@@ -226,7 +226,7 @@ app.post('/children/login', (req, res) => {
         }
   
         const token = jwt.sign({ id: child.id }, SECRET_KEY, { expiresIn: '1h' });
-        res.status(200).send({ token });
+        res.status(200).send({ token,id: child.id });
       }
     );
   });
@@ -332,6 +332,152 @@ app.delete('/polio/:id', (req, res) => {
   });
 
 
+  app.get('/vaccines', (req, res) => {
+    db.all('SELECT * FROM vaccines', [], (err, rows) => {
+      if (err) {
+        res.status(500).send('Error fetching vaccines');
+        return;
+      }
+      res.json(rows);
+    });
+  });
+
+  app.get('/vaccines/received', (req, res) => {
+    db.all(`
+      SELECT c.name AS child_name, c.age, v.name AS vaccine_name, vr.date_received
+      FROM vaccines_received vr
+      JOIN children c ON vr.child_id = c.id
+      JOIN vaccines v ON vr.vaccine_id = v.id
+    `, [], (err, rows) => {
+      if (err) {
+        res.status(500).send('Error fetching vaccines received');
+        return;
+      }
+      res.json(rows);
+    });
+  });
+
+  // Create a new vaccine request
+app.post('/vaccine-requests', (req, res) => {
+  const { childId, vaccineId, requestDate } = req.body;
+console.log(req.body)
+  db.run(
+    `INSERT INTO VaccineRequests (childId, vaccineId, requestDate) VALUES (?, ?, ?)`,
+    [childId, vaccineId, requestDate],
+    function (err) {
+      if (err) {
+        console.log("ERROR", err)
+        return res.status(500).send('Error creating vaccine request');
+      }
+      res.status(201).send({ id: this.lastID });
+    }
+  );
+});
+
+
+  // Get all vaccine requests
+  // Get all vaccine requests with vaccine and child names
+app.get('/vaccine-requests', (req, res) => {
+  const query = `
+    SELECT VaccineRequests.*, Vaccines.name AS vaccineName, Children.name AS childName
+    FROM VaccineRequests
+    JOIN Vaccines ON VaccineRequests.vaccineId = Vaccines.id
+    JOIN Children ON VaccineRequests.childId = Children.id
+  `;
+
+  db.all(query, (err, rows) => {
+    if (err) {
+      return res.status(500).send('Error fetching vaccine requests');
+    }
+    res.status(200).json(rows);
+  });
+});
+
+app.patch('/vaccine-requests/:requestId/approve', (req, res) => {
+  const { requestId } = req.params;
+  
+  // Start a transaction to ensure atomic operations
+  db.serialize(() => {
+    db.run('BEGIN TRANSACTION');
+    
+    // Update request status to 'Approved'
+    db.run(
+      'UPDATE VaccineRequests SET status = ? WHERE id = ?',
+      ['Approved', requestId],
+      function (err) {
+        if (err) {
+          db.run('ROLLBACK');
+          console.log("ERROR",err)
+          return res.status(500).send('Error approving vaccine request');
+        }
+        
+        // Fetch the updated request details
+        db.get(
+          'SELECT * FROM VaccineRequests WHERE id = ?',
+          [requestId],
+          (err, request) => {
+            if (err || !request) {
+              db.run('ROLLBACK');
+              console.log("ERROR2",err)
+              return res.status(500).send('Error fetching approved request details');
+            }
+            
+            // Insert into ReceivedVaccines table
+            db.run(
+              'INSERT INTO VaccineReceived (childId, vaccineId, dateReceived) VALUES (?, ?, ?)',
+              [request.childId, request.vaccineId, new Date()],
+              function (err) {
+                if (err) {
+                  db.run('ROLLBACK');
+                  console.log("ERROR3",err)
+                  return res.status(500).send('Error recording received vaccine');
+                }
+                
+                db.run('COMMIT');
+                res.sendStatus(200);
+              }
+            );
+          }
+        );
+      }
+    );
+  });
+});
+
+
+ // POST endpoint to add a new vaccine
+app.post('/vaccines', (req, res) => {
+  const { name, description } = req.body;
+
+  // Validate inputs
+  if (!name || typeof name !== 'string') {
+    return res.status(400).json({ error: 'Invalid vaccine name' });
+  }
+  if (description && typeof description !== 'string') {
+    return res.status(400).json({ error: 'Invalid vaccine description' });
+  }
+
+  // Use raw SQL query to insert new vaccine
+  const query = `
+    INSERT INTO Vaccines (name, description)
+    VALUES (?, ?)
+  `;
+
+  db.run(query, [name, description], function (err) {
+    if (err) {
+      return res.status(500).json({ error: 'Database error' });
+    }
+
+    // Respond with the newly created vaccine
+    const newVaccine = {
+      id: this.lastID,
+      name,
+      description,
+    };
+
+    res.status(201).json(newVaccine);
+  });
+});
   // Nutrition data
 const nutritionData = [
     {
