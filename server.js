@@ -126,7 +126,7 @@ app.post('/mother/login', (req, res) => {
         return res.status(401).send('Invalid email or password');
       }
       const token = jwt.sign({ id: mother.id }, SECRET_KEY, { expiresIn: '1h' });
-      res.status(200).send({ token });
+      res.status(200).send({ token,motherId:mother.id});
     }
   );
 });
@@ -211,10 +211,12 @@ app.get('/admin/view-users', (req, res) => {
 app.post('/children/login', (req, res) => {
     const { email, password } = req.body;
   
+    console.log("EMAIL",email,password)
     db.get(
       `SELECT * FROM children WHERE email = ?`,
       [email],
       (err, child) => {
+        console.log("EMAIL22",email,password,err,child)
         if (err || !child) {
          console.log("ERROR",err)
           return res.status(401).send('Invalid email or password');
@@ -226,7 +228,7 @@ app.post('/children/login', (req, res) => {
         }
   
         const token = jwt.sign({ id: child.id }, SECRET_KEY, { expiresIn: '1h' });
-        res.status(200).send({ token,id: child.id });
+        res.status(200).send({ token, childrenId: child.id });
       }
     );
   });

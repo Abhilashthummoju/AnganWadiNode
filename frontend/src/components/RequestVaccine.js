@@ -14,7 +14,7 @@ const RequestVaccine = () => {
   }, []);
 
   const handleRequest = (vaccineId) => {
-    const childId = JSON.parse(localStorage.getItem("childId"))
+    const childId = JSON.parse(localStorage.getItem("childrenId"))
     console.log("ABHI",childId)
     fetch('http://localhost:8000/vaccine-requests', {
       method: 'POST',

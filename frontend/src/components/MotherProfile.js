@@ -5,11 +5,12 @@ import axios from 'axios';
 const MotherProfile = () => {
   const [mother, setMother] = useState(null);
   const [error, setError] = useState(null);
-  const motherId = 1; // Replace with the actual mother's ID
+  const motherId = JSON.parse(localStorage.getItem("motherId"));
 
   useEffect(() => {
     const fetchMotherProfile = async () => {
       try {
+        console.log("MOTHER ID:",motherId);
         const response = await axios.get(`http://localhost:8000/mothers/${motherId}`);
         setMother(response.data);
         setError(null);

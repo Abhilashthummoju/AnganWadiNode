@@ -5,8 +5,7 @@ import axios from 'axios';
 const MyAttendance = () => {
   const [attendanceRecords, setAttendanceRecords] = useState([]);
   const [error, setError] = useState(null);
-  const childId = 1; // Replace with the actual child's ID
-
+  const childId = JSON.parse(localStorage.getItem("childrenId"))
   useEffect(() => {
     const fetchAttendance = async () => {
       try {

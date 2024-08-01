@@ -5,11 +5,12 @@ import axios from 'axios';
 const ChildProfile = () => {
   const [child, setChild] = useState(null);
   const [error, setError] = useState(null);
-  const childId = 1; // Replace with the actual child's ID
-
   useEffect(() => {
     const fetchChildProfile = async () => {
       try {
+        const childId = JSON.parse(localStorage.getItem("childrenId"));
+
+        console.log("Child ID:",childId);
         const response = await axios.get(`http://localhost:8000/children/${childId}`);
         setChild(response.data);
         setError(null);
@@ -20,7 +21,7 @@ const ChildProfile = () => {
     };
 
     fetchChildProfile();
-  }, [childId]);
+  }, []);
 
   return (
     <div style={styles.container}>

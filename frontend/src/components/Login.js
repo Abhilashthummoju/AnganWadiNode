@@ -90,10 +90,17 @@ const Login = () => {
       if (!response.ok) {
         throw new Error(data.message || 'An unexpected error occurred');
       }
-      if (data.id) {
-        localStorage.setItem("childId", JSON.stringify(data.id));
-      }
+
+      console.log("LOGIN TOKEN", data.token);
       console.log("LOGIN RESPONSE", data);
+
+      // Store childrenId or motherId in local storage
+      if (data.childrenId) {
+        localStorage.setItem('childrenId', data.childrenId);
+      } else if (data.motherId) {
+        localStorage.setItem('motherId', data.motherId);
+      }
+
       // Navigate to respective home pages on successful login
       if (type === 'admin') {
         navigate('/admin');
